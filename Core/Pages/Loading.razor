@@ -1,0 +1,22 @@
+@using MudBlazor
+
+
+<div class="loading-screen">
+    <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Value="75" Class="my-7" />
+    <div class="loading-progress-text">Loading...</div>
+</div>
+<style>
+    .loading-screen {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: white;
+    }
+    .loading-progress-text {
+        margin-top: 1rem;
+        font-size: 1.5rem;
+        color: #333;
+    }
+</style>

@@ -1,0 +1,35 @@
+@page "/Register"
+@using Shared
+@inject AuthService AuthService
+@inject NavigationManager NavigationManager
+<h3>Register</h3>
+
+<EditForm Model="registerModel" OnValidSubmit="HandleRegister">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <InputText id="username" @bind-Value="registerModel.UserName" placeholder="Username" />
+    <InputText id="email" @bind-Value="registerModel.Email" placeholder="Email" />
+    <InputText id="password" @bind-Value="registerModel.Password" placeholder="Password" type="password" />
+    <button type="submit">Register</button>
+</EditForm>
+
+@code {
+    private RegisterModel registerModel = new RegisterModel();
+
+    private async Task HandleRegister()
+    {
+        var response = await AuthService.RegisterAsync(registerModel);
+        if (response.IsSuccessStatusCode)
+        {
+            // Navigate to home page
+            NavigationManager.NavigateTo("/");
+            
+        }
+        else
+        {
+            // navigate to login
+            NavigationManager.NavigateTo("/Login");
+        }
+    }
+}

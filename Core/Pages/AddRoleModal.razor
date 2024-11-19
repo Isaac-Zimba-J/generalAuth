@@ -1,0 +1,40 @@
+@using MudBlazor
+@using Shared.Services
+@inject IDialogService DialogService
+@inject RoleService RoleService
+
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.h6">Add New Role</MudText>
+        <MudTextField @bind-Value="RoleName" Label="Role Name" FullWidth="true" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="@Submit" Color="Color.Primary">Submit</MudButton>
+        <MudButton OnClick="@Cancel" Color="Color.Secondary">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    public string RoleName { get; set; }
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    private void Submit()
+    {
+        MudDialog.Close(DialogResult.Ok(RoleName));
+        var response =  RoleService.CreateRoleAsync(RoleName);
+        if (response.IsCompleted)
+        {
+            MudDialog.Close(DialogResult.Ok(RoleName));
+        }
+        else
+        {
+            MudDialog.Close(DialogResult.Cancel());
+        }
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+}
