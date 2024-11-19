@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace Shared.Services.Contracts;
+namespace Shared.Services;
 
 public interface IUserService 
 {

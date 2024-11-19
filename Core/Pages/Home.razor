@@ -1,0 +1,63 @@
+﻿@page "/"
+@using MudBlazor
+@using Shared.Services
+@inject NavigationManager NavigationManager
+@inject RoleService roleService
+@inject IDialogService DialogService
+
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-8">
+    <MudPaper Class="pa-6">
+        <MudText Typo="Typo.h4" Align="Align.Center">Welcome to your new app!</MudText>
+        <MudText Typo="Typo.body1" Align="Align.Center" Class="mt-2">Select an action below to manage roles:</MudText>
+        <MudStack Spacing="2" JustifyContent="Center" Class="mt-4">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="OpenAddRoleDialog">Add Role</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary">Assign Role</MudButton>
+        </MudStack>
+    </MudPaper>
+</MudContainer>
+@code {
+    // message after adding a role
+    private string message = string.Empty;
+
+    private async Task OpenAddRoleDialog()
+    {
+        // Optional parameters and options
+        var parameters = new DialogParameters();
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small };
+
+        // Show the dialog
+        var dialog = DialogService.Show<AddRoleModal>("Add Role", parameters, options);
+
+        // Handle the result
+        var result = await dialog.Result;
+
+        if (!result.Canceled && result.Data != null)
+        {
+            string roleName = result.Data.ToString();
+            Console.WriteLine($"New Role: {roleName}");
+
+            if (string.IsNullOrWhiteSpace(roleName))
+            {
+                message = "Role name cannot be empty.";
+                return;
+            }
+
+            // Add logic to save the role name to a database or service
+            var response = await roleService.CreateRoleAsync(roleName);
+            if (response.IsSuccessStatusCode)
+            {
+                // Reload the page to show the new role
+                NavigationManager.NavigateTo("/");
+                // Show a success message
+                message = $"Role '{roleName}' added successfully!";
+            }
+            else
+            {
+                // Show an error message
+                message = $"Failed to add role '{roleName}'. Error: {response.ReasonPhrase}";
+                Console.WriteLine($"Error: {response.ReasonPhrase}");
+            }
+        }
+    }
+}

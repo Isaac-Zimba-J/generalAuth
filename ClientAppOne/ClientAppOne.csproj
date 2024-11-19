@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.5"/>
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.5" PrivateAssets="all"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\ServerOne\ServerOne.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="System.Net.Http">
+        <HintPath>..\..\..\..\..\..\..\usr\local\share\dotnet\shared\Microsoft.NETCore.App\8.0.5\System.Net.Http.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+</Project>

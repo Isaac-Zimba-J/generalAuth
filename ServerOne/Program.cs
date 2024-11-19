@@ -2,9 +2,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using ServerOne.Data;
-using ServerOne.Services;
 using Shared;
-using Shared.Services.Contracts;
+using Shared.Services;
+using UserService = ServerOne.Services.UserService;
+
 
 var builder = WebApplication.CreateBuilder(args);
 

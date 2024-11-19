@@ -1,9 +1,18 @@
-@* @page "/" *@
-@inject NavigationManager Navigation
-
-@code {
-    protected override void OnInitialized()
-    {
-        Navigation.NavigateTo("/Login");
-    }
-}
+@* $1$ Redirect based on a condition #1# *@
+@* @inject NavigationManager Navigation *@
+@* *@
+@* @code { *@
+@*     private bool isUserRegistered = false; // Replace this with actual logic *@
+@* *@
+@*     protected override void OnInitialized() *@
+@*     { *@
+@*         if (isUserRegistered) *@
+@*         { *@
+@*             Navigation.NavigateTo("/Login"); *@
+@*         } *@
+@*         else *@
+@*         { *@
+@*             Navigation.NavigateTo("/Register"); *@
+@*         } *@
+@*     } *@
+@* } *@

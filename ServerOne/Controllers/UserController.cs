@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Shared;
-using Shared.Services.Contracts;
+using Shared.Services;
 
 namespace ServerOne.Controllers;
 

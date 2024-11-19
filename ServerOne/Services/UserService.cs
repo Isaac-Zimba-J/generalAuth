@@ -1,10 +1,11 @@
 using Microsoft.AspNetCore.Identity;
 using Shared;
+using Shared.Services;
 using Shared.Services.Contracts;
 
 namespace ServerOne.Services;
 
-public class UserService(UserManager<ApplicationUser> userManager) : IUserService
+public class UserService(UserManager<ApplicationUser> userManager) :IUserService
 {
     public async Task<IdentityResult> RegisterAsync(ApplicationUser email, string password)
     {

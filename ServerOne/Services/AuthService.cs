@@ -4,7 +4,7 @@ using Shared.Services.Contracts;
 
 namespace ServerOne.Services;
 
-public class AuthService (HttpClient httpClient, UserManager<ApplicationUser> userManager) : IUserService
+public class AuthService (HttpClient httpClient, UserManager<ApplicationUser> userManager) 
 {
     
 

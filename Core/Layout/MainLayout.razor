@@ -1,0 +1,27 @@
+﻿@using MudBlazor
+@inherits LayoutComponentBase
+
+@if (isLoading)
+{
+    <LoadingScreen />
+}
+else
+{
+    @Body
+}
+
+<MudThemeProvider />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+@code {
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Simulate a loading delay
+        await Task.Delay(1000);
+        isLoading = false;
+    }
+}
