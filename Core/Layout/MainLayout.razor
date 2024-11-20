@@ -1,14 +1,29 @@
 ﻿@using MudBlazor
 @inherits LayoutComponentBase
 
-@if (isLoading)
-{
-    <LoadingScreen />
-}
-else
-{
-    @Body
-}
+<MudLayout>
+    <!-- Sidebar -->
+    <MudDrawer Open="true" ClipMode="DrawerClipMode.Always" Width="250px" Variant="DrawerVariant.Persistent" Elevation="0">
+        <MudNavMenu>
+            <MudNavLink Href="/" Icon="@Icons.Material.Filled.Home" Color="@(selectedPage == "Dashboard" ? Color.Error : Color.Default)">Dashboard</MudNavLink>
+            <MudNavLink Match="NavLinkMatch.Prefix" Href="/UserList" Icon="@Icons.Material.Filled.People" Color="@(selectedPage == "Users" ? Color.Error : Color.Default)">Users</MudNavLink>
+            <MudNavLink Href="/thelab" Icon="@Icons.Material.Filled.Science" Color="@(selectedPage == "TheLab" ? Color.Error : Color.Default)">The Lab</MudNavLink>
+            <MudNavLink Href="/weather" Icon="@Icons.Material.Filled.WbSunny" Color="@(selectedPage == "Weather" ? Color.Error : Color.Default)">Weather</MudNavLink>
+        </MudNavMenu>
+    </MudDrawer>
+
+    <!-- Main Content Area -->
+    <MudMainContent>
+        @if (isLoading)
+        {
+            <LoadingScreen />
+        }
+        else
+        {
+            @Body
+        }
+    </MudMainContent>
+</MudLayout>
 
 <MudThemeProvider />
 <MudPopoverProvider />
@@ -17,6 +32,7 @@ else
 
 @code {
     private bool isLoading = true;
+    private string selectedPage = "Dashboard";
 
     protected override async Task OnInitializedAsync()
     {
