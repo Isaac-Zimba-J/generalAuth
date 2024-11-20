@@ -22,4 +22,18 @@ public class UserController(IUserService service) : Controller
         var result = await service.DeleteUserAsync(userId);
         return Ok(result);
     }
+    
+    [HttpGet("GetAllUsers")]
+    public async Task<IActionResult> GetAllUsersAsync()
+    {
+        var result = await service.GetAllUsersAsync();
+        return Ok(result);
+    }
+    
+    [HttpPost("Register")]
+    public async Task<IActionResult> RegisterAsync(ApplicationUser user)
+    {
+        var result = await service.RegisterAsync(user);
+        return Ok(result);
+    }
 }
