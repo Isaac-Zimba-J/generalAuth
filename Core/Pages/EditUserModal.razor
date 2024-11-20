@@ -1,0 +1,86 @@
+@using MudBlazor
+@using Shared
+@using Shared.Services
+@using Shared.Services.Contracts
+@inject IUserService userService
+
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.h6">Edit User</MudText>
+        <MudTextField @bind-Value="UserName" Label="Username" FullWidth="true" />
+        <MudTextField @bind-Value="Email" Label="Email" FullWidth="true" />
+        <MudTextField @bind-Value="PhoneNumber" Label="Phone Number" FullWidth="true" />
+        <MudTextField @bind-Value="Password" Label="Password" FullWidth="true" Type="password" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="@Submit" Color="Color.Primary">Save Changes</MudButton>
+        <MudButton OnClick="@Cancel" Color="Color.Secondary">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public ApplicationUser ExistingUser { get; set; }
+
+    private string UserName { get; set; }
+    private string Email { get; set; }
+    private string PhoneNumber { get; set; }
+    private string Password { get; set; } // Optionally allow users to update the password
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    
+    // get the existing user's data and pre-fill the form
+    
+
+    protected override void OnInitialized()
+    {
+        if (ExistingUser != null)
+        {
+            UserName = ExistingUser.UserName;
+            Email = ExistingUser.Email;
+            PhoneNumber = ExistingUser.PhoneNumber;
+            // Password is not pre-filled for security reasons
+        }
+    }
+
+    private async Task Submit()
+    {
+        if (ExistingUser != null)
+        {
+            ExistingUser.UserName = UserName;
+            ExistingUser.Email = Email;
+            ExistingUser.PhoneNumber = PhoneNumber;
+
+            if (!string.IsNullOrWhiteSpace(Password))
+            {
+                ExistingUser.PasswordHash = Password; // Update password only if provided
+            }
+
+            try
+            {
+                var response = await userService.UpdateUserAsync(ExistingUser);
+                if (response.Succeeded) // Assuming the service returns true on success
+                {
+                    MudDialog.Close(DialogResult.Ok(ExistingUser));
+                }
+                else
+                {
+                    MudDialog.Close(DialogResult.Cancel());
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating user: {ex.Message}");
+                MudDialog.Close(DialogResult.Cancel());
+            }
+        }
+        else
+        {
+            MudDialog.Cancel();
+        }
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+}
