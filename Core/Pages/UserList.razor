@@ -1,0 +1,182 @@
+@page "/UserList"
+@using MudBlazor
+@using Shared
+@using Shared.Services
+@inject IUserService userService
+@inject NavigationManager NavigationManager
+@inject IDialogService DialogService
+
+<div style="position: relative; min-height: 85vh;">
+    <MudTable @ref="_table" T="ApplicationUser" Items="@users"
+              MultiSelection="true" SelectionChangeable="_selectionChangeable"
+              Hover="true" @bind-SelectedItems="selectedItems"
+              OnRowClick="@OnRowClick" SelectOnRowClick="@_selectOnRowClick"
+              Loading="@isLoading" LoadingProgressColor="Color.Primary">
+        <ToolBarContent>
+            <MudText HtmlTag="span" Class="me-4">Selected User: @_selectedUserText</MudText>
+            <MudText>Selected Users (@selectedItems?.Count): @(selectedItems == null ? "" : string.Join(", ", selectedItems.OrderBy(x => x.UserName).Select(x => x.UserName)))</MudText>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<ApplicationUser, object>(x=>x.Id)">ID</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<ApplicationUser, object>(x=>x.UserName)">Username</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<ApplicationUser, object>(x=>x.Email)">Email</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<ApplicationUser, object>(x=>x.PhoneNumber)">Phone</MudTableSortLabel></MudTh>
+            <MudTh>Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="ID">@context.Id</MudTd>
+            <MudTd DataLabel="Username">@context.UserName</MudTd>
+            <MudTd DataLabel="Email">@context.Email</MudTd>
+            <MudTd DataLabel="Phone">@context.PhoneNumber</MudTd>
+            <MudTd>
+                <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Primary"
+                           OnClick="@(() => EditUser(context))">Edit</MudButton>
+                <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Error"
+                           Class="ml-2" OnClick="@(() => DeleteUser(context))">Delete</MudButton>
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[] { 10, 25, 50, 100 }" />
+        </PagerContent>
+        <FooterContent>
+            <MudTFootRow>
+                <MudTd colspan="5">Selected Users: @selectedItems?.Count</MudTd>
+            </MudTFootRow>
+        </FooterContent>
+    </MudTable>
+
+    <div class="mt-4">
+        <MudSwitch @bind-Value="_selectOnRowClick" Color="Color.Primary">Select on row click</MudSwitch>
+        <MudSwitch @bind-Value="_selectionChangeable" Color="Color.Primary">Selection is changeable</MudSwitch>
+    </div>
+
+    @if (showError)
+    {
+        <MudAlert Severity="Severity.Error" Class="mt-2">@errorMessage</MudAlert>
+    }
+
+    <div style="position: fixed; right: 32px; bottom: 32px; z-index: 100;">
+        <MudFab Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Large" OnClick="@(() => OpenAddUserDialog())" />
+    </div>
+</div>
+
+@code {
+    private List<ApplicationUser> users = new List<ApplicationUser>();
+    private HashSet<ApplicationUser> selectedItems = new HashSet<ApplicationUser>();
+    private bool isLoading = true;
+    private bool showError = false;
+    private string errorMessage = string.Empty;
+
+    private bool _selectOnRowClick = true;
+    private bool _selectionChangeable = true;
+    private MudTable<ApplicationUser> _table;
+    private string _selectedUserText = "No user selected";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUsers();
+    }
+
+    private async Task LoadUsers()
+    {
+        try
+        {
+            isLoading = true;
+            users = await userService.GetAllUsersAsync();
+            showError = false;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error loading users: {ex.Message}";
+            showError = true;
+            Console.WriteLine($"Error fetching users: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    void OnRowClick(TableRowClickEventArgs<ApplicationUser> args)
+    {
+        _selectedUserText = $"{args.Item.UserName} ({args.Item.Email})";
+    }
+
+    private async Task OpenAddUserDialog()
+    {
+        // optinal params nigga
+        var parameters = new DialogParameters();
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium };
+        
+        // show the dialog 
+        var dialog = DialogService.Show<AddUserModal>("Add new user", parameters, options);
+        
+        // handle the result
+        var result = await dialog.Result;
+
+        if (!result.Canceled && result.Data != null)
+        {
+            string userData = result.Data.ToString();
+            Console.WriteLine($"New User: {userData}");
+        }
+
+    }
+
+    private async Task EditUser(ApplicationUser user)
+    {
+        try
+        {
+            // optinal params nigga
+            var parameters = new DialogParameters();
+            var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium };
+        
+            // show the dialog 
+            var dialog = DialogService.Show<EditUserModal>("edit  user", parameters, options);
+        
+            // handle the result
+            var result = await dialog.Result;
+
+            if (!result.Canceled && result.Data != null)
+            {
+                string userData = result.Data.ToString();
+                Console.WriteLine($"editted User: {userData}");
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error editing user: {ex.Message}";
+            showError = true;
+        }
+    }
+
+    private async Task DeleteUser(ApplicationUser user)
+    {
+        try
+        {
+            // Add confirmation dialog if needed
+            var response = await userService.DeleteUserAsync(user.Id);
+        
+            // Check if the response is valid JSON
+            if (response.Succeeded)
+            {
+                await LoadUsers(); // Refresh the list
+
+                // Clear selection if the deleted user was selected
+                if (selectedItems.Contains(user))
+                {
+                    selectedItems.Remove(user);
+                }
+            }
+            else
+            {
+                errorMessage = $"Error deleting user: {response?.Errors?.FirstOrDefault()}";
+                showError = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error deleting user: {ex.Message}";
+            showError = true;
+        }
+    }
+}

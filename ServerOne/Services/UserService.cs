@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Shared;
 using Shared.Services;
 using Shared.Services.Contracts;
@@ -7,9 +8,12 @@ namespace ServerOne.Services;
 
 public class UserService(UserManager<ApplicationUser> userManager) :IUserService
 {
-    public async Task<IdentityResult> RegisterAsync(ApplicationUser email, string password)
+    public async Task<IdentityResult> RegisterAsync(ApplicationUser user)
     {
-        throw new NotImplementedException();
+        // throw new NotImplementedException();
+        
+        var result = await userManager.CreateAsync(user, user.PasswordHash);
+        return result;
     }
 
     public async Task<SignInResult> LoginAsync(string email, string password)
@@ -49,5 +53,13 @@ public class UserService(UserManager<ApplicationUser> userManager) :IUserService
         var user1 = await userManager.FindByIdAsync(userId);
         var result = await userManager.DeleteAsync(user1);
         return result;
+    }
+    
+    // get all users 
+    public async Task<List<ApplicationUser>> GetAllUsersAsync()
+    {
+        // throw new NotImplementedException();
+        var users = await userManager.Users.ToListAsync();
+        return users;
     }
 }
